@@ -34,121 +34,162 @@ namespace AnalizadorLexico_2_18_0300_
         // Logica del Boton Analisis Lexico //
         private void Analisis_Lexico_Button_Click(object sender, EventArgs e)
         {
-
-            string frase = richTextBox1.Text;
-            int indice = 0;
+            
+            // Declaro las variables //
+            string texto = richTextBox1.Text;
+            int i = 0;
             int estado = 0;
             int estadoFinal = -1;
             string lexema = "";
             string token;
 
+            // Creo las columnas de la tabla //
             TOKEN_LEXEMA.Columns.Add("ID", "ID");
             TOKEN_LEXEMA.Columns.Add("Lexema", "Lexema");
             TOKEN_LEXEMA.Columns.Add("Token", "Token");
 
-            while ((indice <= (frase.Length - 1)) && (estadoFinal == -1))
+            // Recorro todo lo que este escrito en el richTextBox //
+            while ((i <= (texto.Length - 1)) && (estadoFinal == -1))
             {
+
+                // Inicializo las variables //
                 lexema = " ";
                 token = "error";
-                while ((indice <= (frase.Length - 1)) && (estadoFinal != 25))
+
+                // Recorro el richTextBox hasta el final //
+                while ((i <= (texto.Length - 1)) && (estadoFinal != 25))
                 {
+
+                    // Si el estado final esta en su posicion inicial entonces //
                     if (estadoFinal == -1)
                     {
-                        if (char.IsWhiteSpace(frase[indice]))
+
+                        // Si es un espacio entonces //
+                        if (char.IsWhiteSpace(texto[i]))
                         {
+                            // Pongo el estado final en su posicion inicial //
                             estadoFinal = -1;
                         }
-                        else if (char.IsLetter(frase[indice]) || frase[indice] == '_')
+
+                        // Si es una letra entonces es un identificador //
+                        else if (char.IsLetter(texto[i]) || texto[i] == '_')
                         {
                             estado = 0;
                             estadoFinal = estado;
-                            lexema += frase[indice];
+                            lexema += texto[i];
                             token = "Identificador";
                         }
-                        else if (char.IsDigit(frase[indice]))
+
+                        // Si es un digito entonces es un Entero //
+                        else if (char.IsDigit(texto[i]))
                         {
                             estado = 1;
                             estadoFinal = estado;
-                            lexema += frase[indice];
+                            lexema += texto[i];
                             token = "Entero";
                         }
-                        else
+
+                        else// Caso contrario, envio un error //
                         {
                             estadoFinal = 25;
-                            lexema = frase[indice].ToString();
+                            lexema = texto[i].ToString();
                             token = "Error";
                         }
-                        indice++;
+
+                        i++; // Sigo recorriendo el texto //
+
                     }
+
                     else if (estadoFinal == -1)
                     {
                         estadoFinal = 25;
                     }
-                    else if (estadoFinal == 0)
+
+                    else if (estadoFinal == 0) // Si el estado esta en la posicion 0 osea al principio entonces //
                     {
-                        if (char.IsLetter(frase[indice]) || frase[indice] == '_')
+
+                        // Si es una letra entonces es un identificador //
+                        if (char.IsLetter(texto[i]) || texto[i] == '_')
                         {
                             estado = 0;
                             estadoFinal = estado;
-                            lexema += frase[indice];
+                            lexema += texto[i];
                             token = "Identificador";
-                            indice++;
+                            i++;
                         }
-                        else if (char.IsDigit(frase[indice]))
+
+                        //Si es un digito entonces es un identificador //
+                        else if (char.IsDigit(texto[i]))
                         {
                             estado = 0;
                             estadoFinal = estado;
-                            lexema += frase[indice];
+                            lexema += texto[i];
                             token = "Identificador";
-                            indice++;
+                            i++;
                         }
+
                         else
                         {
                             estadoFinal = 25;
                         }
+
                     }
+
+                    // Si esta en la posicion despues de la primera enconces aqui van los tipos de datos como int, float, etc //
                     else if (estadoFinal == 1)
                     {
-                        if (char.IsDigit(frase[indice]))
+                        // Si es digito entonces es un entero //
+                        if (char.IsDigit(texto[i]))
                         {
                             estado = 1;
                             estadoFinal = estado;
-                            lexema += frase[indice];
+                            lexema += texto[i];
                             token = "Entero";
-                            indice++;
+                            i++;
                         }
-                        else if (frase[indice] == '.')
+
+                        // Si es un punto entonces pongo que es un punto //
+                        else if (texto[i] == '.')
                         {
                             estado = 24;
                             estadoFinal = estado;
-                            lexema += frase[indice];
+                            lexema += texto[i];
                             token = "Punto";
-                            indice++;
+                            i++;
                         }
+
                         else
                         {
                             estadoFinal = 25;
                         }
+
                     }
+
                     else if (estadoFinal == 24)
                     {
-                        if (char.IsDigit(frase[indice]))
+
+                        if (char.IsDigit(texto[i]))
                         {
                             estado = 1;
                             estadoFinal = estado;
-                            lexema += frase[indice];
+                            lexema += texto[i];
                             token = "Float";
-                            indice++;
+                            i++;
                         }
+
                         else
                         {
                             estadoFinal = 25;
                         }
+
                     }
 
                 }
+
+                // Agrego a la tabla //
                 TOKEN_LEXEMA.Rows.Add(estado, lexema, token);
-                estadoFinal = -1;
+                estadoFinal = -1;// Regreso el estado final a su valor inicial //
+
             }
 
         }// Fin de la logica del boton Analisis Lexico //
