@@ -34,24 +34,121 @@ namespace AnalizadorLexico_2_18_0300_
         // Logica del Boton Analisis Lexico //
         private void Analisis_Lexico_Button_Click(object sender, EventArgs e)
         {
-            // Inicializo el analizador lexico //
-            Analiza_Lexico.Inicia();
 
-            // Analizo el texto que esta en el richTextBox //
-            Analiza_Lexico.Analiza(richTextBox1.Text);
+            string frase = richTextBox1.Text;
+            int indice = 0;
+            int estado = 0;
+            int estadoFinal = -1;
+            string lexema = "";
+            string token;
 
-            // Limpio el dataGridView //
-            TOKEN_LEXEMA.Rows.Clear();
+            TOKEN_LEXEMA.Columns.Add("ID", "ID");
+            TOKEN_LEXEMA.Columns.Add("Lexema", "Lexema");
+            TOKEN_LEXEMA.Columns.Add("Token", "Token");
 
-            // Si hay contenido entonces lleno el dataGridView //
-            if (Analiza_Lexico.NoTokens > 0)
-                TOKEN_LEXEMA.Rows.Add(Analiza_Lexico.NoTokens);
-
-            // Recorro todos los valores y los voy mostrando en el dataGriDView //
-            for(int i = 0; i < Analiza_Lexico.NoTokens; i++)
+            while ((indice <= (frase.Length - 1)) && (estadoFinal == -1))
             {
-                TOKEN_LEXEMA.Rows[i].Cells[0].Value = Analiza_Lexico.Token[i];
-                TOKEN_LEXEMA.Rows[i].Cells[1].Value = Analiza_Lexico.Lexema[i];
+                lexema = " ";
+                token = "error";
+                while ((indice <= (frase.Length - 1)) && (estadoFinal != 25))
+                {
+                    if (estadoFinal == -1)
+                    {
+                        if (char.IsWhiteSpace(frase[indice]))
+                        {
+                            estadoFinal = -1;
+                        }
+                        else if (char.IsLetter(frase[indice]) || frase[indice] == '_')
+                        {
+                            estado = 0;
+                            estadoFinal = estado;
+                            lexema += frase[indice];
+                            token = "Identificador";
+                        }
+                        else if (char.IsDigit(frase[indice]))
+                        {
+                            estado = 1;
+                            estadoFinal = estado;
+                            lexema += frase[indice];
+                            token = "Entero";
+                        }
+                        else
+                        {
+                            estadoFinal = 25;
+                            lexema = frase[indice].ToString();
+                            token = "Error";
+                        }
+                        indice++;
+                    }
+                    else if (estadoFinal == -1)
+                    {
+                        estadoFinal = 25;
+                    }
+                    else if (estadoFinal == 0)
+                    {
+                        if (char.IsLetter(frase[indice]) || frase[indice] == '_')
+                        {
+                            estado = 0;
+                            estadoFinal = estado;
+                            lexema += frase[indice];
+                            token = "Identificador";
+                            indice++;
+                        }
+                        else if (char.IsDigit(frase[indice]))
+                        {
+                            estado = 0;
+                            estadoFinal = estado;
+                            lexema += frase[indice];
+                            token = "Identificador";
+                            indice++;
+                        }
+                        else
+                        {
+                            estadoFinal = 25;
+                        }
+                    }
+                    else if (estadoFinal == 1)
+                    {
+                        if (char.IsDigit(frase[indice]))
+                        {
+                            estado = 1;
+                            estadoFinal = estado;
+                            lexema += frase[indice];
+                            token = "Entero";
+                            indice++;
+                        }
+                        else if (frase[indice] == '.')
+                        {
+                            estado = 24;
+                            estadoFinal = estado;
+                            lexema += frase[indice];
+                            token = "Punto";
+                            indice++;
+                        }
+                        else
+                        {
+                            estadoFinal = 25;
+                        }
+                    }
+                    else if (estadoFinal == 24)
+                    {
+                        if (char.IsDigit(frase[indice]))
+                        {
+                            estado = 1;
+                            estadoFinal = estado;
+                            lexema += frase[indice];
+                            token = "Float";
+                            indice++;
+                        }
+                        else
+                        {
+                            estadoFinal = 25;
+                        }
+                    }
+
+                }
+                TOKEN_LEXEMA.Rows.Add(estado, lexema, token);
+                estadoFinal = -1;
             }
 
         }// Fin de la logica del boton Analisis Lexico //
